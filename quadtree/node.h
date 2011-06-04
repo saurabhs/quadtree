@@ -55,6 +55,9 @@ public:
 	void DeleteNode();
 
 	//
+	void MoveNode();
+
+	//
 	void GetQuad();
 
 	//
