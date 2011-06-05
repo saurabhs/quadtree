@@ -41,14 +41,9 @@ using namespace std;
 
 ////////////////////////////////////////////
 
-struct VECTOR2{
-	int x;
-	int y;
-};
-
 struct COORDS{
-	VECTOR2 position;
-	VECTOR2 dimention;
+	D3DXVECTOR2 position;
+	D3DXVECTOR2 dimention;
 
 	COORDS(){
 		position.x = 0;
@@ -70,9 +65,11 @@ struct COORDS{
 		dimention.x = w;
 		dimention.y = h;
 	}
+
+	
 };
 
-typedef VECTOR2 Vector2;
+typedef D3DXVECTOR2 Vector2;
 typedef COORDS Coords;
 
 ////////////////////////////////////////////
@@ -103,15 +100,15 @@ static int GetRandMinMax2(int min, int max){
 ////////////////////////////////////////////
 
 typedef struct _BOUNDINGBOX{
-	D3DXVECTOR3 position;
-	D3DXVECTOR3 dimension;
+	D3DXVECTOR2 position;
+	D3DXVECTOR2 dimension;
 
 	_BOUNDINGBOX(){
-		position = D3DXVECTOR3(0, 0, 0);
-		dimension = D3DXVECTOR3(1, 1, 1);
+		position = D3DXVECTOR2(0, 0);
+		dimension = D3DXVECTOR2(1, 1);
 	}
 
-	_BOUNDINGBOX(D3DXVECTOR3 pos, D3DXVECTOR3 dim){
+	_BOUNDINGBOX(D3DXVECTOR2 pos, D3DXVECTOR2 dim){
 		position = pos;
 		dimension = dim;
 	}
@@ -121,17 +118,17 @@ typedef struct MODEL{
 	LPD3DXMESH mesh;
 	BOUNDINGBOX box;
 	D3DMATERIAL9 matModel;
-	D3DXVECTOR3 rotation;
-	D3DXVECTOR3 scale;
+	D3DXVECTOR2 rotation;
+	D3DXVECTOR2 scale;
 
 	MODEL(){
 		mesh = NULL;
 		box = BOUNDINGBOX();
-		rotation = D3DXVECTOR3(0, 0, 0);
-		scale = D3DXVECTOR3(1, 1, 1);
+		rotation = D3DXVECTOR2(0, 0);
+		scale = D3DXVECTOR2(1, 1);
 	}
 
-	MODEL(LPD3DXMESH _mesh, D3DXVECTOR3 rot, D3DXVECTOR3 sca, D3DMATERIAL9 material, D3DXVECTOR3 boxPos, D3DXVECTOR3 boxDim){
+	MODEL(LPD3DXMESH _mesh, D3DXVECTOR2 rot, D3DXVECTOR2 sca, D3DMATERIAL9 material, D3DXVECTOR2 boxPos, D3DXVECTOR2 boxDim){
 		mesh = _mesh;
 		box = BOUNDINGBOX(boxPos, boxDim);
 		matModel = material;

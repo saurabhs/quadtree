@@ -50,6 +50,7 @@ Node::Node(int xx, int yy, int w, int h){
 	isLeafNode = true;
 
 	ObjectCollector = vector<Coords>();
+	ObjectContainer = vector<Model>();
 }
 
 #ifdef GUI_TREE
@@ -76,8 +77,11 @@ Node::Node(int xx, int yy, int w, int h, LPDIRECT3DDEVICE9 device){
 }
 #endif
 
+//Add to container
 void Node::AddCoordsToRoot(Coords value){ this->ObjectCollector.push_back(value); }
+void Node::AddCoordsToRoot(Model* model){ this->ObjectContainer.push_back(*model); }
 
+//Update Container 
 void Node::UpdateRoot(int index, Coords value){
 	this->ObjectCollector[index] = value;
 	this->GetQuad();
@@ -122,6 +126,43 @@ void Node::DeleteNode(){
 
 	this->isLeafNode = true;
 }
+
+void Node::MoveNode(){
+	vector<Coords> oldPos = vector<Coords>();
+	for(vector<Model>::iterator iter = this->ObjectContainer.begin(); iter != this->ObjectContainer.end(); iter++)
+		oldPos.push_back(Coords(iter->box.position.x, iter->box.position.y, iter->box.dimension.x, iter->box.dimension.y));
+
+	int index = 0;
+	for(vector<Model>::iterator iter = this->ObjectContainer.begin(); iter != this->ObjectContainer.end(); iter++){
+		if(iter->box.position.x != (float)oldPos.at(index).position.x && iter->box.position.y != (float)oldPos.at(index).position.y){
+
+		}
+
+		index++;
+	}	
+}
+
+/*void Node::GetQuad(){
+	if(this->ObjectCollector.size() > 1 && this->depthLevel < MAX_DEPTH){
+		this->AddNode();
+		for(int i = 0; i < 4; i++){
+			for(vector<Coords>::iterator iter = this->ObjectCollector.begin(); iter != this->ObjectCollector.end(); iter++){
+				if(iter->dimention.x < this->width && iter->dimention.y < this->height && 
+					iter->position.x > this->child[i]->x && iter->position.x < (this->child[i]->x + this->child[i]->width) && 
+					iter->position.y > this->child[i]->y && iter->position.y < (this->child[i]->y + this->child[i]->height)){
+						this->child[i]->ObjectCollector.push_back(*iter);
+						//this->DrawGrid();
+						//TODO : delete object which have been already added to its child
+				}
+			}
+			if(this->child[i]->ObjectCollector.size() > 1)
+				this->child[i]->GetQuad();
+		}
+	}
+#ifdef USE_CMD
+	this->DrawTree();
+#endif
+}*/
 
 void Node::GetQuad(){
 	if(this->ObjectCollector.size() > 1 && this->depthLevel < MAX_DEPTH){

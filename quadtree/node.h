@@ -24,9 +24,10 @@ public:
 	Node* parent;
 	Node* child[4];
 
-	Model* model[NUM_OF_SQUARES];
+	Model model[NUM_OF_SQUARES];
 
 	vector<Coords> ObjectCollector;
+	vector<Model> ObjectContainer;
 
 #ifndef USE_CMD
 	GraphicalQuadTree* grid;
@@ -42,8 +43,11 @@ public:
 	Node(int xx, int yy, int w, int h, LPDIRECT3DDEVICE9 device);
 #endif
 
-	//add Coords value to root nore
+	//add Coords value to root node
 	void AddCoordsToRoot(Coords value);
+
+	//add Model* to root node
+	void AddCoordsToRoot(Model* model);
 
 	//
 	void UpdateRoot(int index, Coords value);

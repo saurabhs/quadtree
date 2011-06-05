@@ -29,6 +29,7 @@ public:
 	void RunInLoop();
 
 	Coords GetModelsData(int index);
+	Model* GetModel(int index);
 
 	void DrawSquare();
 	void RenderSquare();

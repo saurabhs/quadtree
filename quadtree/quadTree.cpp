@@ -22,9 +22,9 @@ void QuadTree::RunOnce(HWND hwnd){
 		//model and its bounding box's position
 		float xx = (float)GetRandMinMax2(0, MAX_X);
 		float yy = (float)GetRandMinMax2(0, MAX_Y);
-		model[i]->box.position = D3DXVECTOR3(xx, yy, 0);
+		model[i]->box.position = D3DXVECTOR2(xx, yy);
 		
-		model[i] = new Model(NULL, D3DXVECTOR3(0, 0, 0), D3DXVECTOR3(1, 1, 1), material, model[i]->box.position, model[i]->box.dimension);
+		model[i] = new Model(NULL, D3DXVECTOR2(0, 0), D3DXVECTOR2(1, 1), material, model[i]->box.position, model[i]->box.dimension);
 	}
 
 	DrawSquare();
@@ -53,6 +53,10 @@ Coords QuadTree::GetModelsData(int index){
 	return Coords(x, y, w, h);
 }
 
+Model* QuadTree::GetModel(int index){
+	return model[index];
+}
+
 void QuadTree::GetMinMax(Model* model){
 	D3DXVECTOR3 Min, Max;
 	void* v;
@@ -61,7 +65,10 @@ void QuadTree::GetMinMax(Model* model){
 	D3DXComputeBoundingBox((D3DXVECTOR3*)v, model->mesh->GetNumVertices(), D3DXGetFVFVertexSize(model->mesh->GetFVF()), &Min, &Max);
 	model->mesh->UnlockVertexBuffer();
 
-	model->box.dimension = (Max - Min);
+	D3DXVECTOR2 _min = D3DXVECTOR2(Min.x, Min.y);
+	D3DXVECTOR2 _max = D3DXVECTOR2(Max.x, Max.y);
+
+	model->box.dimension = (_max - _min);
 }
 
 void QuadTree::DrawSquare(){
@@ -77,7 +84,7 @@ void QuadTree::RenderSquare(){
 		D3DXMATRIX matTranslate, matRotation, matWorld;
 
 		d3ddev->SetMaterial(&material);
-		D3DXMatrixTranslation(&matTranslate, model[i]->box.position.x, model[i]->box.position.y, model[i]->box.position.z);
+		D3DXMatrixTranslation(&matTranslate, model[i]->box.position.x, model[i]->box.position.y, 0);
 		
 		d3ddev->SetTransform(D3DTS_WORLD, &matTranslate);
 		d3ddev->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
@@ -102,14 +109,14 @@ bool QuadTree::CollisionDetection(Model* modelA, Model* modelB){
 	D3DXVECTOR3 gap = modelA->box.position - modelB->box.position;
 	gap.x = fabs(gap.x);
 	gap.y = fabs(gap.y);
-	gap.z = fabs(gap.z);
+	//gap.z = fabs(gap.z);
 
 	D3DXVECTOR3 maxGap = (modelA->box.dimension + modelB->box.dimension) * 0.5f;
 	maxGap.x = fabs(maxGap.x);
 	maxGap.y = fabs(maxGap.y);
-	maxGap.z = fabs(maxGap.z);
+	//maxGap.z = fabs(maxGap.z);
 
-	if((gap.x < maxGap.x) && (gap.y < maxGap.y) && (gap.z < maxGap.z))
+	if((gap.x < maxGap.x) && (gap.y < maxGap.y)) //&& (gap.z < maxGap.z))
 		return true;
 
 	return false;

@@ -107,8 +107,8 @@ int main(){
 	Node* node = new Node(-512, -512, 1024, 1024);
 #endif
 
-	for(int i = 0; i < NUM_OF_SQUARES; i++)
-		node->AddCoordsToRoot(qt->GetModelsData(i));
+	for(int i = 0; i < NUM_OF_SQUARES; i++) 
+		node->AddCoordsToRoot(qt->GetModel(i));
 
 	node->GetQuad();
 
@@ -128,8 +128,7 @@ int main(){
 			dx->ClearBackBuffer();
 			dx->Begin();
 			{
-					node->UpdateRoot(i, qt->GetModelsData(i));
-
+				node->MoveNode();
 				//dx->SetCamera();
 				qt->RenderSquare();
 				qt->SimulateSquare();
