@@ -10,8 +10,8 @@
 
 class Node{
 public:
-	int x; 
-	int y; 
+	float x; 
+	float y; 
 
 	int width;
 	int height;
@@ -27,7 +27,7 @@ public:
 	Model model[NUM_OF_SQUARES];
 
 	vector<Coords> ObjectCollector;
-	vector<Model> ObjectContainer;
+	//vector<Model> ObjectContainer;
 
 #ifndef USE_CMD
 	GraphicalQuadTree* grid;
@@ -37,7 +37,7 @@ public:
 	//constructors
 	Node();
 	Node(D3DXVECTOR3 position, D3DXVECTOR3 dimension);
-	Node(int xx, int yy, int w, int h);
+	Node(float xx, float yy, int w, int h);
 
 #ifdef GUI_TREE
 	Node(int xx, int yy, int w, int h, LPDIRECT3DDEVICE9 device);
@@ -49,25 +49,28 @@ public:
 	//add Model* to root node
 	void AddCoordsToRoot(Model* model);
 
-	//
-	void UpdateRoot(int index, Coords value);
+	//Update node on the event of deletion or object movement
+	void UpdateRoot();
+	void UpdateRoot(Node* node);
 
 	//add new node and its children and their children to eternity!
 	void AddNode();
 
 	//delete the children and their children to eternity!, make the node a leaf
 	void DeleteNode();
+	void DeleteNode2();
 
 	//
-	void MoveNode();
+	void MoveNode(D3DXVECTOR2 position, int objectToDelete);
 
 	//
-	void GetQuad();
+	void GetQuad(bool drawTree = true);
 
 	//
 	void GetQuad2Grid(Coords value);
 
-	void NodeCorrection();
+	//
+	void Foobar();
 
 #ifdef GUI_TREE
 	//grid

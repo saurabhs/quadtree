@@ -25,6 +25,8 @@ int main(){
 	foo->AddCoordsToRoot(Ball4);
 	foo->AddCoordsToRoot(Ball5);
 
+	foo->Foobar();
+
 	/*int BAR = 25;
 	Coords test[25];
 
@@ -33,7 +35,7 @@ int main(){
 		foo->AddCoordsToRoot(test[i]);
 	}*/
 
-	foo->GetQuad();
+	//foo->GetQuad();
 
 	_getch();
 }

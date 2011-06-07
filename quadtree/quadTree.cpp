@@ -45,10 +45,10 @@ void QuadTree::RunInLoop(){
 }
 
 Coords QuadTree::GetModelsData(int index){
-	int x = (int)model[index]->box.position.x;
-	int y = (int)model[index]->box.position.y;
-	int w = (int)model[index]->box.dimension.x;
-	int h = (int)model[index]->box.dimension.y;
+	float x = model[index]->box.position.x;
+	float y = model[index]->box.position.y;
+	float w = model[index]->box.dimension.x;
+	float h = model[index]->box.dimension.y;
 
 	return Coords(x, y, w, h);
 }

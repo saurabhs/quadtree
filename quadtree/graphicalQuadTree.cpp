@@ -1,4 +1,4 @@
-#include "GraphicalQuadTree.h"
+#include "graphicalQuadTree.h"
 
 #define D3DFVF_TLVERTEX ( D3DFVF_XYZRHW | 
 

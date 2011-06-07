@@ -8,7 +8,7 @@
 #include "dx.h"
 #endif
 #ifndef _GRAPHICAL_QUADTREE
-#include "GraphicalQuadTree.h"
+#include "graphicalQuadTree.h"
 #endif
 
 #ifndef _QUADTREE

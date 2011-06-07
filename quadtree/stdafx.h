@@ -1,7 +1,7 @@
 #ifndef _STDAFX
 #define _STDAFX
 
-//#define USE_CMD
+#define USE_CMD
 //#define GUI_TREE
 
 #include <iostream>
@@ -52,14 +52,14 @@ struct COORDS{
 		dimention.y = 0;
 	}
 
-	COORDS(D3DXVECTOR3 pos, D3DXVECTOR3 dim){
-		position.x = (int)pos.x;
-		position.y = (int)pos.y;
-		dimention.x = (int)dim.x;
-		dimention.y = (int)dim.y;
+	COORDS(D3DXVECTOR2 pos, D3DXVECTOR2 dim){
+		position.x = pos.x;
+		position.y = pos.y;
+		dimention.x = dim.x;
+		dimention.y = dim.y;
 	} 
 
-	COORDS(int x, int y, int w, int h){
+	COORDS(float x, float y, float w, float h){
 		position.x = x;
 		position.y = y;
 		dimention.x = w;
