@@ -58,7 +58,13 @@ public:
 
 	//delete the children and their children to eternity!, make the node a leaf
 	void DeleteNode();
-	void DeleteNode2();
+
+	//
+	void DeleteObject(Coords value);
+
+	//
+	Node* SearchNode(Coords value);
+	//void SearchNode(Coords value);
 
 	//
 	void MoveNode(D3DXVECTOR2 position, int objectToDelete);

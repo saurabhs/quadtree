@@ -123,28 +123,40 @@ void Node::DeleteNode(){
 	this->isLeafNode = true;
 }
 
-void Node::MoveNode(D3DXVECTOR2 position, int objectToDelete){
-	this->x = position.x;
-	this->y = position.y;
+void Node::DeleteObject(Coords value){
 
+}
+
+Node* Node::SearchNode(Coords value){
+//void Node::SearchNode(Coords value){
+	if(this->isLeafNode) return this;
+	for(int i = 0; i < 4; i++)
+		if(value.position.x > this->child[i]->x && value.position.x < (this->child[i]->x + this->child[i]->width) &&
+			value.position.y > this->child[i]->y && value.position.y < (this->child[i]->y + this->child[i]->height)){
+			this->child[i]->SearchNode(value);
+			break;
+		}
+
+	//return NULL; //func should return some value (?)
+}
+
+void Node::MoveNode(D3DXVECTOR2 position, int objectToDelete){
 	vector<Coords>::iterator iter = this->ObjectCollector.begin() + objectToDelete;
 
 	int w = (int)iter->dimention.x;
 	int h = (int)iter->dimention.y;
 
 	this->ObjectCollector.erase(iter);
-
 	this->GetQuad(false);
 
 	Coords newItem = Coords(position.x, position.y, w, h);
 	this->AddCoordsToRoot(newItem);
 	
-	//this->UpdateRoot();
-
+	this->UpdateRoot();
 	this->GetQuad();
 }
 
-//Update Container 
+//Update Container
 void Node::UpdateRoot(){
 	if(!this->ObjectCollector.size()){
 		if(this->parent)
@@ -163,11 +175,8 @@ void Node::GetQuad(bool drawTree){
 			for(vector<Coords>::iterator iter = this->ObjectCollector.begin(); iter != this->ObjectCollector.end(); iter++){
 				if(iter->dimention.x < this->width && iter->dimention.y < this->height && 
 					iter->position.x > this->child[i]->x && iter->position.x < (this->child[i]->x + this->child[i]->width) && 
-					iter->position.y > this->child[i]->y && iter->position.y < (this->child[i]->y + this->child[i]->height)){
+					iter->position.y > this->child[i]->y && iter->position.y < (this->child[i]->y + this->child[i]->height))
 						this->child[i]->ObjectCollector.push_back(*iter);
-						//this->DrawGrid();
-						//TODO : delete object which have been already added to its child
-				}
 			}
 			if(this->child[i]->ObjectCollector.size() > 1)
 				this->child[i]->GetQuad();
@@ -196,8 +205,10 @@ void Node::Foobar(){
 	int item;
 	float x, y, w, h;
 	Coords newPos;
+	Node* temp;
+
 	vector<Coords>::iterator iter;
-	cout<<"\n1. Add Object\n2. Delete Object\n3. Move Object\n\nEnter 1/2/3 : ";
+	cout<<"\n1. Add Object\n2. Delete Object\n3. Move Object\n4. Search Object\n\nEnter 1/2/3/4 : ";
 	cin>>choice;
 
 	system("cls");
@@ -219,10 +230,23 @@ void Node::Foobar(){
 			this->GetQuad();
 
 			iter = this->ObjectCollector.begin() + item;
+			temp = this->SearchNode(Coords(iter->position, iter->dimention));
+			if(temp->ObjectCollector.size() == 1) iter = temp->ObjectCollector.begin();
+			
+			/*
+			for(vector<Coords>::iterator iterChild = temp->ObjectCollector.begin(); iterChild != temp->ObjectCollector.end(); iterChild++)
+				if(iter == iterChild){
+					iter = iterChild;
+					break;
+				}
+			*/
+
+			temp->ObjectCollector.erase(iter);
 			this->ObjectCollector.erase(iter);
+			
 			cout<<"\nTree after deletion: ";
 			cout<<"\nContainer size is "<<this->ObjectCollector.size();
-			this->GetQuad();
+			temp->GetQuad();
 			break;
 
 		case 3:
@@ -233,15 +257,28 @@ void Node::Foobar(){
 			cin>>x>>y;
 			
 			cout<<"\nTree before moving the object: ";
-			this->GetQuad();
+			//this->GetQuad();
 			
 			/*this->ObjectCollector.at(item).position.x = x; this->ObjectCollector.at(item).position.y = y;
 			cout<<"\nTree before moving the object: ";*/
 
-			cout<<"\n/////////////////////";
+			cout<<"\nTree after moving the object: ";
 
 			this->MoveNode(D3DXVECTOR2(x, y), item);
 			//this->DrawTree();
+			break;
+
+		case 4:
+			cout<<"\nEnter object ID to search (container size is "<<this->ObjectCollector.size()<<") : ";
+			cin>>item;
+			iter = this->ObjectCollector.begin() + item;
+
+			cout<<"\nCurrent tree structure :";
+			this->GetQuad();
+
+			temp = this->SearchNode(Coords(iter->position, iter->dimention));
+			cout<<"\nObject position: ";
+			cout<<temp->nodeID;
 			break;
 	}
 }
