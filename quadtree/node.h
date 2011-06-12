@@ -18,6 +18,7 @@ public:
 
 	int depthLevel;
 	int nodeID;
+	int parentNodeID;
 
 	bool isLeafNode;
 
@@ -51,16 +52,18 @@ public:
 
 	//Update node on the event of deletion or object movement
 	void UpdateRoot();
-	void UpdateRoot(Node* node);
+
+	//
+	void UpdateQuad();
 
 	//add new node and its children and their children to eternity!
 	void AddNode();
 
 	//delete the children and their children to eternity!, make the node a leaf
-	void DeleteNode();
+	void DeleteChildNodes();
 
 	//
-	void DeleteObject(Coords value);
+	void DeleteObject(D3DXVECTOR2 value);
 
 	//
 	Node* SearchNode(Coords value);
@@ -70,7 +73,7 @@ public:
 	void MoveNode(D3DXVECTOR2 position, int objectToDelete);
 
 	//
-	void GetQuad(bool drawTree = true);
+	void BuildQuad(bool drawTree = true);
 
 	//
 	void GetQuad2Grid(Coords value);

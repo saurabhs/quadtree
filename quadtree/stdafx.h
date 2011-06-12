@@ -65,8 +65,6 @@ struct COORDS{
 		dimention.x = w;
 		dimention.y = h;
 	}
-
-	
 };
 
 typedef D3DXVECTOR2 Vector2;

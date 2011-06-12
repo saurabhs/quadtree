@@ -15,6 +15,7 @@ Node::Node(){
 
 	depthLevel = 0;
 	nodeID = 1;
+	parentNodeID = 0;
 
 	isLeafNode = true;
 }
@@ -31,6 +32,7 @@ Node::Node(D3DXVECTOR3 position, D3DXVECTOR3 dimension){
 
 	depthLevel = 0;
 	nodeID = 1;
+	parentNodeID = 0;
 
 	isLeafNode = true;
 }
@@ -47,6 +49,7 @@ Node::Node(float xx, float yy, int w, int h){
 
 	depthLevel = 0;
 	nodeID = 1;
+	parentNodeID = 0;
 
 	isLeafNode = true;
 
@@ -108,33 +111,43 @@ void Node::AddNode(){
 		this->child[i]->parent = this;
 		this->child[i]->depthLevel = this->depthLevel + 1;
 		this->child[i]->nodeID = ++index;
+		this->child[i]->parentNodeID = this->nodeID;
 		this->child[i]->ObjectCollector = vector<Coords>();
 	}
 }
 
-void Node::DeleteNode(){
-	if(!this->isLeafNode){
+void Node::DeleteChildNodes(){
+	if(!this->isLeafNode && this->ObjectCollector.size() < 2){
 		for(int i = 0; i < 4; i++){
-			this->child[i]->DeleteNode();
+			this->child[i]->DeleteChildNodes();
 			delete this->child[i];
+			this->isLeafNode = true;
 		}
 	}
-
-	this->isLeafNode = true;
 }
 
-void Node::DeleteObject(Coords value){
+void Node::DeleteObject(D3DXVECTOR2 value){
+	for(vector<Coords>::iterator iter = this->ObjectCollector.begin(); iter != this->ObjectCollector.end(); iter++)
+		if(value == iter->position){
+			this->ObjectCollector.erase(iter);
+			break;
+		}
 
+	if(!this->isLeafNode)
+		for(int i = 0; i < 4; i++)
+			this->child[i]->DeleteObject(value);
+
+	this->DeleteChildNodes();
 }
 
-Node* Node::SearchNode(Coords value){
 //void Node::SearchNode(Coords value){
+Node* Node::SearchNode(Coords value){
 	if(this->isLeafNode) return this;
 	for(int i = 0; i < 4; i++)
 		if(value.position.x > this->child[i]->x && value.position.x < (this->child[i]->x + this->child[i]->width) &&
 			value.position.y > this->child[i]->y && value.position.y < (this->child[i]->y + this->child[i]->height)){
 			this->child[i]->SearchNode(value);
-			break;
+			continue;
 		}
 
 	//return NULL; //func should return some value (?)
@@ -146,29 +159,50 @@ void Node::MoveNode(D3DXVECTOR2 position, int objectToDelete){
 	int w = (int)iter->dimention.x;
 	int h = (int)iter->dimention.y;
 
-	this->ObjectCollector.erase(iter);
-	this->GetQuad(false);
+	this->DeleteObject(iter->position);
+	this->AddCoordsToRoot(Coords(position.x, position.y, w, h));
+	this->UpdateQuad();
 
-	Coords newItem = Coords(position.x, position.y, w, h);
-	this->AddCoordsToRoot(newItem);
-	
-	this->UpdateRoot();
-	this->GetQuad();
+	this->DrawTree();
 }
 
-//Update Container
-void Node::UpdateRoot(){
-	if(!this->ObjectCollector.size()){
-		if(this->parent)
-			this->parent->UpdateRoot();
-		if(!this->parent->ObjectCollector.size()){					//!this->isLeafNode && //-> why?
-			nodeToDelete = this->parent;							//RECURSION = INCEPTION
-			nodeToDelete->DeleteNode();
-		}
+/*void Node::UpdateRoot(){
+	if(this->ObjectCollector.size() > 1 && this->isLeafNode){
+		this->AddNode();
+		this->BuildQuad();
 	}
+
+	if(!this->isLeafNode)
+		for(int i = 0; i < 4; i++)
+			this->child[i]->UpdateRoot();
+}*/
+
+void Node::UpdateQuad(){
+	int objectCountChild = 0;
+	bool matched = false;
+
+	if(!this->isLeafNode) 
+		for(int i = 0; i < 4; i++) 
+			objectCountChild += this->child[i]->ObjectCollector.size();
+
+	if(!this->isLeafNode)
+		if(objectCountChild != this->ObjectCollector.size())
+			for(int i = 0; i < 4; i++)
+				for(vector<Coords>::iterator iter = this->ObjectCollector.begin(); iter != this->ObjectCollector.end(); iter++)
+					if(iter->position.x > this->child[i]->x && iter->position.x < (this->x + this->width) && iter->position.y > this->child[i]->y && iter->position.y < (this->y + this->height)){
+						for(vector<Coords>::iterator iter2 = this->child[i]->ObjectCollector.begin(); iter2 != this->child[i]->ObjectCollector.end(); iter2++){
+							if(iter->position.x == iter2->position.x && iter->position.y == iter2->position.y){
+								matched = true;
+							}
+						}
+						if(!matched){
+							this->child[i]->BuildQuad(false);
+							this->child[i]->UpdateQuad();
+						}
+					}
 }
 
-void Node::GetQuad(bool drawTree){
+void Node::BuildQuad(bool drawTree){
 	if(this->ObjectCollector.size() > 1 && this->depthLevel < MAX_DEPTH){
 		this->AddNode();
 		for(int i = 0; i < 4; i++){
@@ -179,9 +213,10 @@ void Node::GetQuad(bool drawTree){
 						this->child[i]->ObjectCollector.push_back(*iter);
 			}
 			if(this->child[i]->ObjectCollector.size() > 1)
-				this->child[i]->GetQuad();
+				this->child[i]->BuildQuad();
 		}
 	}
+
 	if(drawTree)
 		this->DrawTree();
 }
@@ -219,7 +254,7 @@ void Node::Foobar(){
 			cin>>x>>y>>w>>h;
 			newPos = Coords(x, y, w, h);
 			this->AddCoordsToRoot(newPos);
-			this->GetQuad();
+			this->BuildQuad();
 			break;
 
 		case 2:
@@ -227,26 +262,13 @@ void Node::Foobar(){
 			cin>>item;
 			
 			cout<<"\nTree before deletion: ";
-			this->GetQuad();
+			this->BuildQuad();
 
 			iter = this->ObjectCollector.begin() + item;
-			temp = this->SearchNode(Coords(iter->position, iter->dimention));
-			if(temp->ObjectCollector.size() == 1) iter = temp->ObjectCollector.begin();
-			
-			/*
-			for(vector<Coords>::iterator iterChild = temp->ObjectCollector.begin(); iterChild != temp->ObjectCollector.end(); iterChild++)
-				if(iter == iterChild){
-					iter = iterChild;
-					break;
-				}
-			*/
-
-			temp->ObjectCollector.erase(iter);
-			this->ObjectCollector.erase(iter);
 			
 			cout<<"\nTree after deletion: ";
-			cout<<"\nContainer size is "<<this->ObjectCollector.size();
-			temp->GetQuad();
+			this->DeleteObject(iter->position);
+			this->DrawTree();
 			break;
 
 		case 3:
@@ -257,15 +279,10 @@ void Node::Foobar(){
 			cin>>x>>y;
 			
 			cout<<"\nTree before moving the object: ";
-			//this->GetQuad();
+			this->BuildQuad();
 			
-			/*this->ObjectCollector.at(item).position.x = x; this->ObjectCollector.at(item).position.y = y;
-			cout<<"\nTree before moving the object: ";*/
-
-			cout<<"\nTree after moving the object: ";
-
+			cout<<"\n\nTree after moving the object: ";
 			this->MoveNode(D3DXVECTOR2(x, y), item);
-			//this->DrawTree();
 			break;
 
 		case 4:
@@ -274,7 +291,7 @@ void Node::Foobar(){
 			iter = this->ObjectCollector.begin() + item;
 
 			cout<<"\nCurrent tree structure :";
-			this->GetQuad();
+			this->BuildQuad();
 
 			temp = this->SearchNode(Coords(iter->position, iter->dimention));
 			cout<<"\nObject position: ";
@@ -284,20 +301,23 @@ void Node::Foobar(){
 }
 
 void Node::DrawTree(){
-	cout<<"\n\nNode ID : "<<this->nodeID;
+	//if(!this->isLeafNode){
+	cout<<"\n\nNode ID : "<<this->nodeID<<"\nChild of Node : "<<this->parentNodeID;
 	cout<<"\nNode X: "<<this->x<<", Node Y: "<<this->y;
 	cout<<"\nNode W: "<<this->width<<", Node H: "<<this->height;
 	cout<<"\nDepth: "<<this->depthLevel<<", Object Contains: "<<this->ObjectCollector.size();
+	cout<<"\nIs Leaf : "<<this->isLeafNode;
+	//}
 
 	if(!this->isLeafNode)
 		for(int i = 0; i < 4; i++){
-			cout<<"\n\nNode ID : "<<this->child[i]->nodeID;
+			cout<<"\n\nNode ID : "<<this->child[i]->nodeID; //<<"\nChild of Node : "<<this->parentNodeID;
 			cout<<"\nNode X: "<<this->child[i]->x<<", Node Y: "<<this->child[i]->y;
 			cout<<"\nNode W: "<<this->child[i]->width<<", Node H: "<<this->child[i]->height;
 			cout<<"\nDepth: "<<this->child[i]->depthLevel<<", Object Contains: "<<this->child[i]->ObjectCollector.size();
+			cout<<"\nIs Leaf : "<<this->child[i]->isLeafNode;
+
 			//cout<<"\n\nChild["<<i<<"] :";
 			//this->child[i]->DrawTree();
 		}
-
-	cout<<"\n";
 }

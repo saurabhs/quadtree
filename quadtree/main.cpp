@@ -13,17 +13,20 @@
 int main(){
 	Node* foo = new Node();
 	
+	int id = 0;
 	Coords Ball = Coords(400, 400, 32, 32);
 	Coords Ball2 = Coords(10, 10, 32, 32);
 	Coords Ball3 = Coords(300, 100, 32, 32);
 	Coords Ball4 = Coords(300, 200, 32, 32);
 	Coords Ball5 = Coords(268, 168, 32, 32);
+	Coords Ball6 = Coords(68, 368, 32, 32);
 
 	foo->AddCoordsToRoot(Ball);
 	foo->AddCoordsToRoot(Ball2);
 	foo->AddCoordsToRoot(Ball3);
 	foo->AddCoordsToRoot(Ball4);
 	foo->AddCoordsToRoot(Ball5);
+	//foo->AddCoordsToRoot(Ball6);
 
 	foo->Foobar();
 
@@ -112,7 +115,7 @@ int main(){
 	for(int i = 0; i < NUM_OF_SQUARES; i++) 
 		node->AddCoordsToRoot(qt->GetModel(i));
 
-	node->GetQuad();
+	node->BuildQuad();
 
 	srand(GetTickCount());
 
