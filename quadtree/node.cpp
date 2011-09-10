@@ -154,16 +154,11 @@ Node* Node::SearchNode(Coords value){
 }
 
 void Node::MoveNode(D3DXVECTOR2 position, int objectToDelete){
-	vector<Coords>::iterator iter = this->ObjectCollector.begin() + objectToDelete;
-
-	int w = (int)iter->dimention.x;
-	int h = (int)iter->dimention.y;
-
-	this->DeleteObject(iter->position);
-	this->AddCoordsToRoot(Coords(position.x, position.y, w, h));
+	vector<Coords>::iterator iter = this->ObjectCollector.begin() + objectToMove;
+	iter->position = position;
 	this->UpdateQuad();
 
-	this->DrawTree();
+	//this->DrawTree();
 }
 
 /*void Node::UpdateRoot(){
