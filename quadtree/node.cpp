@@ -261,6 +261,7 @@ void Node::Foobar(){
 
 			iter = this->ObjectCollector.begin() + item;
 			
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 			cout<<"\nTree after deletion: ";
 			this->DeleteObject(iter->position);
 			this->DrawTree();
@@ -297,6 +298,7 @@ void Node::Foobar(){
 
 void Node::DrawTree(){
 	//if(!this->isLeafNode){
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 	cout<<"\n\nNode ID : "<<this->nodeID<<"\nChild of Node : "<<this->parentNodeID;
 	cout<<"\nNode X: "<<this->x<<", Node Y: "<<this->y;
 	cout<<"\nNode W: "<<this->width<<", Node H: "<<this->height;
@@ -305,6 +307,7 @@ void Node::DrawTree(){
 	//}
 
 	if(!this->isLeafNode)
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
 		for(int i = 0; i < 4; i++){
 			cout<<"\n\nNode ID : "<<this->child[i]->nodeID; //<<"\nChild of Node : "<<this->parentNodeID;
 			cout<<"\nNode X: "<<this->child[i]->x<<", Node Y: "<<this->child[i]->y;
