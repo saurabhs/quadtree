@@ -65,18 +65,27 @@ public:
 	//
 	void DeleteObject(D3DXVECTOR2 value);
 
-	//
+	//Search for a object in the tree
 	Node* SearchNode(Coords value);
 	//void SearchNode(Coords value);
 
-	//
-	void MoveNode(D3DXVECTOR2 position, int objectToDelete);
+	//perform actions for moving a object
+	void MoveNode(D3DXVECTOR2 position, int objectToMove);
+
+	//perform actions at the previous position of the object
+	void PreMoveNode(Node* node, bool iterateTopNode);
+
+	//perform actions at the new position of the object
+	void PostMoveNode(Coords objectTMove);
 
 	//
 	void BuildQuad(bool drawTree = true);
 
 	//
 	void GetQuad2Grid(Coords value);
+
+	//returns the top most quad for any child / grandchild
+	Node* GetAbsoluteParent();
 
 	//
 	void Foobar();

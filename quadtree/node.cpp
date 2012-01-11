@@ -142,35 +142,73 @@ void Node::DeleteObject(D3DXVECTOR2 value){
 
 //void Node::SearchNode(Coords value){
 Node* Node::SearchNode(Coords value){
-	if(this->isLeafNode) return this;
+	if(this->isLeafNode)
+		return this;
+
 	for(int i = 0; i < 4; i++)
 		if(value.position.x > this->child[i]->x && value.position.x < (this->child[i]->x + this->child[i]->width) &&
-			value.position.y > this->child[i]->y && value.position.y < (this->child[i]->y + this->child[i]->height)){
-			this->child[i]->SearchNode(value);
-			continue;
+			value.position.y > this->child[i]->y && value.position.y < (this->child[i]->y + this->child[i]->height))
+		{
+			return this->child[i]->SearchNode(value);
 		}
 
-	//return NULL; //func should return some value (?)
+	return this;			//func should return some value (?)
 }
 
-void Node::MoveNode(D3DXVECTOR2 position, int objectToDelete){
+void Node::MoveNode(D3DXVECTOR2 position, int objectToMove){
+	//get the object to be moved
 	vector<Coords>::iterator iter = this->ObjectCollector.begin() + objectToMove;
-	iter->position = position;
-	this->UpdateQuad();
-
-	//this->DrawTree();
+	Coords obj = Coords(iter->position, iter->dimention);
+	
+	//save old position
+	D3DXVECTOR2 oldPosition = iter->position;
+	
+	//save old node
+	Node* oldNode = SearchNode(obj);
+	
+	//move the object to new position
+	obj.position = position;
+	
+	//for old node
+	PreMoveNode(oldNode, true);
+	
+	//for new node
+	PostMoveNode(obj);
 }
 
-/*void Node::UpdateRoot(){
-	if(this->ObjectCollector.size() > 1 && this->isLeafNode){
-		this->AddNode();
-		this->BuildQuad();
+void Node::PreMoveNode(Node* node, bool iterateTopNode)
+{
+	Node* moveNode = node;
+	
+	if(iterateTopNode)
+	{
+		moveNode = node->GetAbsoluteParent();
 	}
-
-	if(!this->isLeafNode)
+		
+	if(moveNode->ObjectCollector.size() < 2 && !moveNode->isLeafNode)                                                                                                                                                                                                                                                                   
+	{
 		for(int i = 0; i < 4; i++)
-			this->child[i]->UpdateRoot();
-}*/
+		{
+			delete moveNode->child[i];
+		}	
+	}
+	else
+	{
+		if(!moveNode->isLeafNode)
+		{
+			for(int i = 0; i < 4; i++)
+			{
+				PreMoveNode(moveNode->child[i], false);
+			}
+		}
+	}
+}
+
+void Node::PostMoveNode(Coords objectTMove)
+{
+	Node* newNode = SearchNode(objectTMove);
+	newNode->BuildQuad(false);
+}
 
 void Node::UpdateQuad(){
 	int objectCountChild = 0;
@@ -214,6 +252,14 @@ void Node::BuildQuad(bool drawTree){
 
 	if(drawTree)
 		this->DrawTree();
+}
+
+Node* Node::GetAbsoluteParent()
+{
+	if(this->depthLevel == 0)
+		return this;
+	else 
+		return this->parent->GetAbsoluteParent();
 }
 
 #ifdef GUI_TREE
@@ -279,6 +325,9 @@ void Node::Foobar(){
 			
 			cout<<"\n\nTree after moving the object: ";
 			this->MoveNode(D3DXVECTOR2(x, y), item);
+
+			this->DrawTree();
+
 			break;
 
 		case 4:
